@@ -1,28 +1,20 @@
 let {cloneTowLevelArray} = require('./util.js');
 
-let maps = [
-    [3,5,7],
-    [11,13],
-    [17,19,23]
-];
-
-let skus = [
-    [3,11,17],
-    [3,13,19]
-];
-
-class FindPath{
+class PathFinder{
     constructor(maps,skus){
         this.maps = maps;
         this.skus = skus;
 
         this._skusAsKey = {};
+        
         this._cacheNum = {};
 
         this.light = [[]];
 
         this.selected = [];
         this.emptySelected = [];
+
+        this._skusIndex = {};
 
         this.init();
         this._check();
@@ -52,6 +44,7 @@ class FindPath{
         for(i=0;i<skus.length;i++){
             let key = skus[i].join(';');
             this._skusAsKey[key] = 1;
+            this._skusIndex[key] = i;
         }
 
         this._initNum();
@@ -150,6 +143,15 @@ class FindPath{
             this.selected[point[0]] = val;
             this._check();
         }
+
+        // 判断是否选取结束，返回选取的 sku 结果
+        return this.getSkuIndex();
+    }
+
+    getSkuIndex(){
+        let skuKey = this.selected.join(';');
+        let selectKey = this._skusIndex[skuKey];
+        return (typeof selectKey !== 'undefined')?selectKey:-1;
     }
 
     del(point){
@@ -163,44 +165,4 @@ class FindPath{
     }
 }
 
-
-
-let path = new FindPath(maps,skus);
-console.log(path.light);
-
-path.add([1,1]);
-console.log(path.light);
-
-path.add([1,0]);
-console.log(path.light);
-
-path.del([1,0]);
-console.log(path.light);
-
-console.log(path._cacheNum);
-
-/**
- * getNum 的测试部分；
- */
-
-// var sku = {
-//     "10;20;30": 1,
-//     "10;20;31": 2,
-//     "11;20;30": 1,
-//     "10;21;31": 2,
-//     "10;21;32": 9
-// };
-
-// var maps = [
-//     [10, 11, 12],
-//     [20, 21],
-//     [30, 31, 32]
-// ];
-
-// console.log(getNum("10;;"));
-
-// console.log(getNum("11;;")); //输出1
-
-// console.log(getNum("10;21;")); //输出11
-
-// console.log(getNum(";21;31")); //输出2
+module.exports = PathFinder;

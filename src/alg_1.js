@@ -1,16 +1,5 @@
 let {cloneTowLevelArray,containSubArray} = require('./util.js');
 
-let maps = [
-    [3,5,7],
-    [11,13],
-    [17,19,23]
-];
-
-let skus = [
-    [3,11,17],
-    [3,13,19]
-];
-
 /***
  * 
  * maps 所有属性值的组合
@@ -20,6 +9,7 @@ class PathFinder{
     constructor(maps,skus){
         this.maps = maps;
         this.skus = skus;
+        this.skusKeys = Object.keys(skus);
 
         // 属性值在 maps 中的下标索引值
         this._way = [];
@@ -55,19 +45,19 @@ class PathFinder{
     _check(){
         let light = this.light,
             maps = this.maps,
-            skus = this.skus,
+            skusKeys = this.skusKeys,
             i,
             j;
 
         for(i=0;i<light.length;i++){
             let row = light[i];
             let selected = this._getSelected(i);
-            let filteredSkus = this._filterSkus(selected,skus);
+            let filteredSkusKeys = this._filterSkus(selected,skusKeys);
             
             for(j=0;j<row.length;j++){
                 if(row[j] !== 2){
                     let currentValue = maps[i][j];
-                    light[i][j] = this._checkItem(currentValue,filteredSkus);
+                    light[i][j] = this._checkItem(currentValue,filteredSkusKeys);
                 }
             }
         }
@@ -94,24 +84,26 @@ class PathFinder{
         return ret;
     }
 
-    _checkItem(value,skus){
-        let filteredSkus = this._filterSkus([value],skus);
-        return filteredSkus.length?1:0;
+    _checkItem(value,skusKeys){
+        let filteredSkusKeys = this._filterSkus([value],skusKeys);
+        return filteredSkusKeys.length?1:0;
     }
 
     // 根据已经选取的组合过滤 skus；
-    _filterSkus(selected,skus){
+    _filterSkus(selected,skusKeys){
         let ret = [];
+        let skus = this.skus;
 
         if(selected.length){
-            for(let i=0;i<skus.length;i++){
-                let isContain = containSubArray(skus[i],selected);
+            for(let i=0;i<skusKeys.length;i++){
+                let sku = skus[skusKeys[i]];
+                let isContain = containSubArray(sku,selected);
                 if(isContain){
-                    ret.push(skus[i]);
+                    ret.push(skusKeys[i]);
                 }
             }
         }else{
-            ret = skus;
+            ret = skusKeys;
         }
 
         return ret;
@@ -132,6 +124,23 @@ class PathFinder{
         this.selected.push(val);
         this.light[coordinate[0]][coordinate[1]] = 2;
         this._check();
+
+        // 判断是否选取结束，返回选取的 sku 结果
+        return this.getSkuIndex();
+    }
+
+    getSkuIndex(){
+        let index = -1;
+
+        if(this.selected.length === this.maps.length){
+            let filterSkusKeys = this._filterSkus(this.selected,this.skusKeys);
+            
+            
+            if(filterSkusKeys.length === 1){
+                index = filterSkusKeys[0];
+            }
+        }
+        return index;
     }
 
     _dealChange(coordinate){
@@ -169,14 +178,4 @@ class PathFinder{
     }
 }
 
-let path = new PathFinder(maps,skus);
-console.log(path.light);
-
-path.add([1,1]);
-console.log(path.light);
-
-path.add([1,0]);
-console.log(path.light);
-
-path.del([1,0]);
-console.log(path.light);
+module.exports = PathFinder;
