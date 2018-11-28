@@ -51,33 +51,31 @@ class PathFinder{
     _initNum(){
         let skus = this.skus;
         
+        
         for(let i=0;i<skus.length;i++){
-            this._resolveSku(skus[i]);
+            let num = this._skusAsKey[skus[i].join(';')];
+            this._resolveSku([],skus[i],num);
         }
+
+        // console.log('_cacheNum',this._cacheNum);
     }
 
-    _resolveSku(sku){
-        let emptySelected = this.emptySelected,
-            cacheNum = this._cacheNum,
-            length= sku.length,
-            skuKey = sku.join(';'),
-            num = this._skusAsKey[skuKey];
+    _resolveSku(select,sku,initNum){
+        let cacheNum = this._cacheNum;
 
-        for(let i=0;i<length;i++){
-
-            let select = emptySelected.slice();
-
-            for(let j = i;j<length;j++){
-                select[j] = sku[j];
-                let key = select.join(';');
-
-                if(!cacheNum[key]){
-                    cacheNum[key] = num;
-                }else{
-                    cacheNum[key] += num;
-                }
+        if(select.length === sku.length){
+            let key = select.join(';');
+            if(!cacheNum[key]){
+                cacheNum[key] = initNum;
+            }else{
+                cacheNum[key] += initNum;
             }
-        } 
+        }else{
+            let length = select.length;
+            let val = sku[length];
+            this._resolveSku(select.concat(''),sku,initNum);
+            this._resolveSku(select.concat(val),sku,initNum);
+        }
     }
 
     _check(){
@@ -92,9 +90,11 @@ class PathFinder{
             let selectedCopy = selected.slice();
 
             for(j=0;j<row.length;j++){
-                let val = row[j];
-                selectedCopy[i] = val;
-                light[i][j] = this._getCacheNum(selectedCopy.join(';'))?1:0;
+                if(typeof selectedCopy !== 'undefined'){
+                    let val = row[j];
+                    selectedCopy[i] = val;
+                    light[i][j] = this._getCacheNum(selectedCopy.join(';'))?1:0;
+                }
             }
         }
 

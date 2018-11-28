@@ -2,6 +2,26 @@
 
 本仓库只是对[sku组合查询算法探索](http://git.shepherdwind.com/sku-search-algorithm.html) 一文的整理，并补充了原文中的代码。
 
+## 属性介绍
+
+* `light` 二维数组
+表示属性是否可以选择：0 不可选 | 1、2 可选
+
+* `selected` 一维数组
+表示已经选择的属性
+
+## 方法介绍
+
+* `add([x,y])` 
+接收一个数组，选取下标为 `x`、`y` 的属性，返回值与 `getSkuIndex` 相同；
+
+* `getSkuIndex()`
+当还没有选取完整的属性时，返回 -1；
+如果已经选取了一组完整的 `sku` 组合，返回所选取的 `sku` 的下标
+
+* `del([x,y])`
+取消选取下标为 `x`、`y` 的属性
+
 ## 示例
 
 ```javascript
