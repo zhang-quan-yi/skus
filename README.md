@@ -2,6 +2,8 @@
 
 本仓库只是对[sku组合查询算法探索](http://git.shepherdwind.com/sku-search-algorithm.html) 一文的整理，并补充了原文中的代码。
 
+算法封装成为了 `PathFinder` 类，它的属性和方法介绍如下：
+
 ## 属性介绍
 
 * `light` 二维数组
